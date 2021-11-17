@@ -1,3 +1,4 @@
+from collections import deque
 import sys
 input = sys.stdin.readline
 
@@ -13,21 +14,22 @@ def get_neighbors(box, pos, m, n):
     neighbors = []
     offset = [(1, 0), (-1, 0), (0, 1), (0, -1)]
     for i in offset:
-        temp = tuple(map(lambda x, y: x + y, i, pos))
+        #temp = tuple(map(lambda x, y: x + y, i, pos))
+        dx, dy = i
+        x, y = pos
+        temp = (x + dx, y + dy)
         if is_valid(box, temp, m, n):
             neighbors.append(temp)
     return neighbors
 
 m, n = map(int, input().rstrip().split())
-print(m, n)
-print(type(m))
 
-box = []
-for i in range(n):
-    box.append(map(int, input().rstrip().split()))
+#box = []
+#for i in range(n):
+#    box.append(map(int, input().rstrip().split()))
+box = [list(map(int, input().rstrip().split())) for _ in range(n)]
 
-print(box)
-print(get_neighbors(box, (5, 3), m, n))
+"""
 changed = True
 days = 0
 while (changed):
@@ -57,5 +59,41 @@ for i in range(n):
     for j in range(m):
         if box[i][j] == 0:
             print(-1)
-            exit(0)
+            sys.exit(0)
 print(days-1)
+"""
+
+days = 0
+
+queue = deque(())
+for i in range(n):
+    for j in range(m):
+        if box[i][j] == 1:
+            queue.append((i, j))
+
+print(box)
+print(queue)
+
+offset = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+dx = [0, 0, 1, -1]
+dy = [1, -1, 0, 0]
+while queue:
+    pos = queue.popleft()
+    x, y = pos
+    for i in range(4):
+        nx, ny = dx[i] + x, dy[i] + y
+        if 0 <= nx < n and 0 <= ny < m and box[nx][ny] == 0:
+            box[nx][ny] = box[x][y] + 1
+            queue.append((nx,ny))
+print(box)
+
+for i in range(n):
+    for j in range(m):
+        if box[i][j] == 0:
+            print(-1)
+            sys.exit(0)
+    days = max(days, max(box[i]))
+
+print(days - 1)
+        
+
